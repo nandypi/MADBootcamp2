@@ -1,9 +1,16 @@
 from flask import Flask, render_template, request
-from flask_restful import Api, Resource
 
 
 app = Flask(__name__)
-api = Api(app)
+
+# connect with the api endpoints defined in apis.py
+from apis import api, Resource
+api.init_app(app)
+
+# connect with database models defined in models.py
+from models import db, User
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+db.init_app(app)
 
 @app.route('/', methods=['GET', 'POST', 'PUT', 'DELETE'])
 def hello():
@@ -30,16 +37,22 @@ class HelloWorld(Resource):
         return {'message': 'PUT request received'}
     def delete(self):
         return {'message': 'DELETE request received'}
-    
-class Students(Resource):
-    def get(self):
-        # students = Students.query.all()
-        # students = [student.name for student in students]
-        students = ['Alice', 'Bob', 'Charlie']
-        return {'students': students}
-
 api.add_resource(HelloWorld, '/hello')
-api.add_resource(Students, '/students')
 
 if __name__ == '__main__':
+
+    with app.app_context():
+        
+        db.create_all()  # Create database tables if they don't exist
+
+        admin = User.query.filter_by(role='admin').first()
+        
+        if admin:
+            print("Admin user already exists.")
+        else:
+            print("Admin user does not exist. Creating admin user...")
+            admin = User(username='admin', email='admin@gmail.com', role='admin', password='admin')
+            db.session.add(admin)
+            db.session.commit()
+
     app.run(debug=True)
