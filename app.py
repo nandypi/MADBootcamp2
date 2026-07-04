@@ -1,7 +1,10 @@
 from flask import Flask, render_template, request
+from flask_jwt_extended import JWTManager
 
 
 app = Flask(__name__)
+app.config['JWT_SECRET_KEY'] = 'your-secret-key'  # Change this to a random secret key
+jwt = JWTManager(app)
 
 # connect with the api endpoints defined in apis.py
 from apis import api, Resource
