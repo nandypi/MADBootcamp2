@@ -9,6 +9,17 @@ from models import db, User, Book
 
 api = Api()
 
+class HelloWorld(Resource):
+    def get(self):
+        return {'message': 'Hello, World!'}
+    def post(self):
+        return {'message': 'POST request received'}
+    def put(self):
+        return {'message': 'PUT request received'}
+    def delete(self):
+        return {'message': 'DELETE request received'}
+api.add_resource(HelloWorld, '/hello')
+
 class Register(Resource):
     def post(self):
         data = request.get_json()
