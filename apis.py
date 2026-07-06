@@ -75,21 +75,39 @@ class BookResource(Resource):
     def post(self):
         if not is_admin(get_jwt_identity()):
             return {'message': 'Admin privileges required to create a book'}, 403
-        
-        print('Admin user verified. Proceeding to create book.')
-        return {'message': 'Create book endpoint'}, 201
+        data = request.get_json()
+        if not data or 'title' not in data or 'description' not in data:
+            return {'message': 'Please provide all required fields'}, 400
+        if not all([data['title'], data['description']]):
+            return {'message': 'Please provide all required fields with data'}, 400
+        book = Book(title=data['title'], description=data['description'])
+        db.session.add(book)
+        db.session.commit()
+        return {'message': 'Book created successfully', 'book': {'id': book.id, 'title': book.title, 'description': book.description}}, 201
     @jwt_required()
-    def put(self):
+    def put(self, book_id):
         if not is_admin(get_jwt_identity()):
             return {'message': 'Admin privileges required to create a book'}, 403
-        
-        return {'message': 'Update book endpoint'}
+        book = Book.query.get(book_id)
+        if not book:
+            return {'message': 'Book not found'}, 404
+        data = request.get_json()
+        if not data:
+            return {'message': 'Please provide data to update'}, 400
+        book.title = data.get('title', book.title)
+        book.description = data.get('description', book.description)
+        db.session.commit()
+        return {'message': 'Book updated successfully'}
     @jwt_required()
-    def delete(self):
+    def delete(self, book_id):
         if not is_admin(get_jwt_identity()):
-            return {'message': 'Admin privileges required to create a book'}, 403
-        
-        return {'message': 'Delete book endpoint'}
+            return {'message': 'Admin privileges required to delete a book'}, 403
+        book = Book.query.get(book_id)
+        if not book:
+            return {'message': 'Book not found'}, 404
+        db.session.delete(book)
+        db.session.commit()
+        return {'message': 'Book deleted successfully'}
 api.add_resource(BookResource, '/books', '/books/<int:book_id>')
 
 print(__name__, 'test the import')

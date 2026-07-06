@@ -53,7 +53,7 @@ export default {
 
                 console.log(data)
 
-                localStorage.setItem('token', JSON.stringify(data.access_token))
+                localStorage.setItem('token', data.access_token)
                 localStorage.setItem('user', JSON.stringify(data.user))
 
                 if (data.user.role == 'admin') {
