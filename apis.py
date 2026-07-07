@@ -4,10 +4,22 @@ all application endpoints are defined here
 from flask import request
 from flask_restful import Api, Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity, create_access_token
+from flask_caching import Cache
+
+cache = Cache()
 
 from models import db, User, Book
 
 api = Api()
+
+import time
+
+class TestCaching(Resource):
+    @cache.cached(timeout=60)
+    def get(self):
+        user_count = User.query.count(); time.sleep(5)
+        return {'message': 'This is response from api'}, 200
+api.add_resource(TestCaching, '/test-caching')
 
 class HelloWorld(Resource):
     def get(self):
