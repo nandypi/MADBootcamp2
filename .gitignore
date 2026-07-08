@@ -4,3 +4,6 @@ instance
 venv
 
 .env
+
+
+celerybeat*
