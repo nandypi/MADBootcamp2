@@ -34,3 +34,17 @@ cd frontend
 npm install # installs node modules (requried packages for frontend app)
 npm run dev # run the FE server
 ```
+
+## Run Celery App
+
+### Worker
+
+```bash
+celery -A celery_app worker --loglevel=info # ONLY WINDOWS USERS ADD "--pool=solo"
+```
+
+### Beat
+
+```bash
+celery -A celery_app beat --loglevel=info
+```
