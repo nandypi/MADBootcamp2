@@ -14,6 +14,19 @@ api = Api()
 
 import time
 
+class CeleryTest(Resource):
+    # @jwt_required()
+    def get(self):
+        from celery_app import long_running_task        
+        result = long_running_task.delay()
+
+        # current_user = get_jwt_identity()
+        # from celery_app import generate_csv_report
+        # generate_csv_report.delay(current_user)
+
+        return {'message': 'Task triggered'}, 202
+api.add_resource(CeleryTest, '/celery-test')
+
 class TestCaching(Resource):
     @cache.cached(timeout=60)
     def get(self):
